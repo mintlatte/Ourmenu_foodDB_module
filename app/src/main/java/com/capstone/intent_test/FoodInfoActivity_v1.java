@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,6 +28,11 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
     TextView nutrientsTextView;
     TextView foodContextView;
 
+    TextView nutrientsTitleTextView;
+    TextView flavorsTitleTextView;
+    TextView ingreTitleTextView;
+    TextView poweredByTitleTextView;
+    TextView dataFromTitleTextView;
     TextView hasFlavorTextView;
     TextView fatsecretAttrTextView;
     TextView yummlyAttrRecipeTextView;
@@ -34,6 +41,13 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
     TextView yummlyAttrSrcUrlTextView;
 
     ViewPager foodImgViewPager;
+
+    TextView bitterTextView;
+    TextView meatyTextView;
+    TextView piquantTextView;
+    TextView saltyTextView;
+    TextView sourTextView;
+    TextView sweetTextView;
 
     ProgressBar bitterPB;
     ProgressBar meatyPB;
@@ -51,13 +65,17 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
     String food_txt_withSpace = new String();
     String selectedLang = new String();
     ArrayList<String> foodImgUrlList = new ArrayList<String>();
-    ArrayList<String> foodContextList = new ArrayList<String>();
+    ArrayList<String> spoonsFoodIngreList = new ArrayList<String>();
+    ArrayList<String> yummlyFoodIngreList = new ArrayList<String>();
 
     String fatsecretHomepageURL = "http://platform.fatsecret.com";
     String yummlyAttrRecipeURL;
     String yummlyAttrText;
     String yummlyAttrSrcName;
     String yummlyAttrSrcURL;
+
+    FoodInfoContents myFoodInfoContents;
+    boolean menu_activated = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +89,12 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
         food_txt_withSpace = inputText;
         selectedLang = myIntent.getStringExtra("selectedLang");
 
+        nutrientsTitleTextView = (TextView) findViewById(R.id.nutrientsTitleTextView);
+        flavorsTitleTextView = (TextView) findViewById(R.id.flavorsTitleTextView);
+        ingreTitleTextView = (TextView) findViewById(R.id.ingreTitleTextView);
+        poweredByTitleTextView = (TextView) findViewById(R.id.poweredByTitleTextView);
+        dataFromTitleTextView = (TextView) findViewById(R.id.dataFromTitleTextView);
+
         hasFlavorTextView = (TextView) findViewById(R.id.hasFlavorTextView);
         foodNameTextView = (TextView) findViewById(R.id.food_name_textView);
         nutrientsTextView = (TextView) findViewById(R.id.nutrients_textView);
@@ -83,6 +107,13 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
         yummlyAttrSrcTextView = (TextView) findViewById(R.id.yummlySrcTextView);
         yummlyAttrSrcUrlTextView = (TextView) findViewById(R.id.yummlySrcUrlTextView);
 
+        bitterTextView = (TextView) findViewById(R.id.bitter_textView);
+        meatyTextView = (TextView) findViewById(R.id.meaty_textView);
+        piquantTextView = (TextView) findViewById(R.id.piquant_textView);
+        saltyTextView = (TextView) findViewById(R.id.salty_textView);
+        sourTextView = (TextView) findViewById(R.id.sour_textView);
+        sweetTextView = (TextView) findViewById(R.id.sweet_textView);
+
         bitterPB = (ProgressBar) findViewById(R.id.bitter_progressBar);
         meatyPB = (ProgressBar) findViewById(R.id.meaty_progressBar);
         piquantPB = (ProgressBar) findViewById(R.id.piquant_progressBar);
@@ -93,6 +124,9 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
         Spanned fatsecretLink = Html.fromHtml("<a href=\"http://platform.fatsecret.com\">Powered by FatSecret</a>");
         fatsecretAttrTextView.setMovementMethod(LinkMovementMethod.getInstance());
         fatsecretAttrTextView.setText(fatsecretLink);
+
+        myFoodInfoContents = new FoodInfoContents();
+        myFoodInfoContents.setOriginFoodName(food_txt_withSpace);
 
         CustomAdapter foodImgAdapter = new CustomAdapter(this, getLayoutInflater());
 
@@ -134,9 +168,12 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
                         String foodDescription = temp_food.getString("food_description");
 
                         foodInfoBundle.putString("foodDescription", foodDescription);
+                        myFoodInfoContents.setOriginNutrientsContext(foodDescription);
                         // Long temp_food_id = temp_food.getLong("food_id");
                         // JSONObject foodGetRet = myFatsecretGet.getFood(temp_food_id);
                     }
+                    else
+                        myFoodInfoContents.setOriginNutrientsContext("There are not nutrients information");
 
                 } catch (Exception e) {
                     System.out.println("Fatsecret Thread Error Occurred");
@@ -234,6 +271,8 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
                     foodInfoBundle.putString("attrText", myYummly.getAttr_text());
                     foodInfoBundle.putString("attrSrcName", myYummly.getAttr_srcName());
                     foodInfoBundle.putString("attrSrcUrl", myYummly.getAttr_srcUrl());
+
+                    yummlyFoodIngreList.addAll(myYummly.getFoodIngredients());
                 }
                 else
                     isThereFoodData = false;
@@ -252,7 +291,7 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
                 ArrayList<String> spoons_foodContextList = foodInfoBundle.getStringArrayList("contextList");
 
                 foodImgUrlList.addAll(spoons_imgUrlList);
-                foodContextList.addAll(spoons_foodContextList);
+                spoonsFoodIngreList.addAll(spoons_foodContextList);
             }
         };
 
@@ -262,11 +301,13 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
                 Spoonacular spoons = new Spoonacular();
                 spoons.getFoodInfoBySpoon(food_txt_noSpace);
 
-                ArrayList<String> spoons_imgUrlList = spoons.getFoodImgUrlList();
-                ArrayList<String> spoons_foodContextList = spoons.getFoodIngredients();
+                if(spoons.isThereFoodData()) {
+                    ArrayList<String> spoons_imgUrlList = spoons.getFoodImgUrlList();
+                    ArrayList<String> spoons_foodContextList = spoons.getFoodIngredients();
 
-                foodImgUrlList.addAll(spoons_imgUrlList);
-                foodContextList.addAll(spoons_foodContextList);
+                    foodImgUrlList.addAll(spoons_imgUrlList);
+                    spoonsFoodIngreList.addAll(spoons_foodContextList);
+                }
                 /*
                 Bundle foodInfoBundle = new Bundle();
 
@@ -338,15 +379,118 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
 
         String foodIngreString = "";
 
-        for(int i = 0; i < foodContextList.size(); i++) {
-            if(i != foodContextList.size() - 1)
-                foodIngreString += foodContextList.get(i) + ", ";
-            else
-                foodIngreString += foodContextList.get(i);
+        if(yummlyFoodIngreList.size() > 0) {
+            for (int i = 0; i < yummlyFoodIngreList.size(); i++) {
+                if (i != yummlyFoodIngreList.size() - 1)
+                    foodIngreString += yummlyFoodIngreList.get(i) + ", ";
+                else
+                    foodIngreString += yummlyFoodIngreList.get(i);
+            }
         }
+        else if(spoonsFoodIngreList.size() > 0) {
+            for (int i = 0; i < spoonsFoodIngreList.size(); i++) {
+                if (i != spoonsFoodIngreList.size() - 1)
+                    foodIngreString += spoonsFoodIngreList.get(i) + ", ";
+                else
+                    foodIngreString += spoonsFoodIngreList.get(i);
+            }
+        }
+        else
+            foodIngreString = "There are not ingredients information";
 
+        myFoodInfoContents.setOriginIngreContext(foodIngreString);
         // System.out.println("food ingre str : " + foodIngreString);
         foodContextView.setText(foodIngreString);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if(!menu_activated)
+            getMenuInflater().inflate(R.menu.result_activity_menu, menu);
+        else
+            getMenuInflater().inflate(R.menu.result_activity_menu2, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.action_translate) {
+            menu_activated = true;
+
+            if(myFoodInfoContents.isTranslated() == false) {
+                /*
+                번역 작동
+                 */
+                myFoodInfoContents.setTransFoodName("김치찌개");
+
+                myFoodInfoContents.setTransNurientsTitle("영양성분");
+                myFoodInfoContents.setTransNutrientsContext("1 1 / 4 컵당 - 칼로리 : 240kcal | 지방 : 10.00g | 탄수화물 : 30.00g | 단백질 : 8.00g");
+
+                myFoodInfoContents.setTransFlavorsTitle("맛");
+                myFoodInfoContents.setTransBitter("쓴맛");
+                myFoodInfoContents.setTransMeaty("고기맛");
+                myFoodInfoContents.setTransPiquant("톡 쏘는맛");
+                myFoodInfoContents.setTransSalty("짠맛");
+                myFoodInfoContents.setTransSour("신맛");
+                myFoodInfoContents.setTransSweet("단맛");
+
+                myFoodInfoContents.setTransIngreTitle("재료");
+                myFoodInfoContents.setTransIngreContext("김치, 돼지고기, 양파, 대파, 마늘, 생강, 소금, 버섯");
+
+                myFoodInfoContents.setTransPoweredByTitle("도와주신 분들");
+                myFoodInfoContents.setTransDataFromTitle("데이터 장소");
+
+                myFoodInfoContents.setTranslated(true);
+            }
+
+            foodNameTextView.setText(myFoodInfoContents.getTransFoodName());
+
+            nutrientsTitleTextView.setText(myFoodInfoContents.getTransNurientsTitle());
+            nutrientsTextView.setText(myFoodInfoContents.getTransNutrientsContext());
+
+            flavorsTitleTextView.setText(myFoodInfoContents.getTransFlavorsTitle());
+            bitterTextView.setText(myFoodInfoContents.getTransBitter());
+            meatyTextView.setText(myFoodInfoContents.getTransMeaty());
+            piquantTextView.setText(myFoodInfoContents.getTransPiquant());
+            saltyTextView.setText(myFoodInfoContents.getTransSalty());
+            sourTextView.setText(myFoodInfoContents.getTransSour());
+            sweetTextView.setText(myFoodInfoContents.getTransSweet());
+
+            ingreTitleTextView.setText(myFoodInfoContents.getTransIngreTitle());
+            foodContextView.setText(myFoodInfoContents.getTransIngreContext());
+
+            poweredByTitleTextView.setText(myFoodInfoContents.getTransPoweredByTitle());
+            dataFromTitleTextView.setText(myFoodInfoContents.getTransDataFromTitle());
+
+            invalidateOptionsMenu();
+        }
+        else if(item.getItemId() == R.id.action_back_translate) {
+            menu_activated = false;
+
+            foodNameTextView.setText(myFoodInfoContents.getOriginFoodName());
+
+            nutrientsTitleTextView.setText(myFoodInfoContents.getOriginNurientsTitle());
+            nutrientsTextView.setText(myFoodInfoContents.getOriginNutrientsContext());
+
+            flavorsTitleTextView.setText(myFoodInfoContents.getOriginFlavorsTitle());
+            bitterTextView.setText(myFoodInfoContents.getOriginBitter());
+            meatyTextView.setText(myFoodInfoContents.getOriginMeaty());
+            piquantTextView.setText(myFoodInfoContents.getOriginPiquant());
+            saltyTextView.setText(myFoodInfoContents.getOriginSalty());
+            sourTextView.setText(myFoodInfoContents.getOriginSour());
+            sweetTextView.setText(myFoodInfoContents.getOriginSweet());
+
+            ingreTitleTextView.setText(myFoodInfoContents.getOriginIngreTitle());
+            foodContextView.setText(myFoodInfoContents.getOriginIngreContext());
+
+            poweredByTitleTextView.setText(myFoodInfoContents.getOriginPoweredByTitle());
+            dataFromTitleTextView.setText(myFoodInfoContents.getOriginDataFromTitle());
+
+            invalidateOptionsMenu();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void mOnClick(View v) {

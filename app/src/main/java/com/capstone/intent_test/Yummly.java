@@ -146,6 +146,12 @@ public class Yummly {
 
             if(returnedFoodArray.length() > 0) {
                 JSONObject first_food = returnedFoodArray.getJSONObject(0);
+                for(int i = 1; i < returnedFoodArray.length(); i++) {
+                    if(first_food.getString("flavors").compareTo("null") == 0)
+                        first_food = returnedFoodArray.getJSONObject(i);
+                    else
+                        break;
+                }
                 ret = first_food.getString("id");
             }
             else {

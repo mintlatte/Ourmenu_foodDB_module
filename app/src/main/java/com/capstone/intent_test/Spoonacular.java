@@ -19,11 +19,19 @@ public class Spoonacular {
     private final String spoon_key = "sAcepFcMKomshyynyECAhHF6Y8kTp1jIcotjsnlWrissS3KMRQ";
     private ArrayList<String> foodImgUrlList = new ArrayList<String>();
     private ArrayList<String> foodIngredients = new ArrayList<String>();
+    private boolean isThereFoodData;
 
     public void getFoodInfoBySpoon(String food_txt) {
         try {
             JSONObject resultJson = getFoodIdBySpoon(food_txt);
             JSONArray foodIdArray = resultJson.getJSONArray("results");
+
+            if(foodIdArray.length() == 0) {
+                setThereFoodData(false);
+                return;
+            }
+
+            setThereFoodData(true);
             String food_id = foodIdArray.getJSONObject(0).get("id").toString();
             String urlForIngre = base_url_for_recipe + food_id + "/information?includeNutrition=false";
             ArrayList<String> foodIngre = getFoodIngreBySpoon(urlForIngre);
@@ -129,6 +137,14 @@ public class Spoonacular {
         }
 
         return jsonObj;
+    }
+
+    public boolean isThereFoodData() {
+        return isThereFoodData;
+    }
+
+    public void setThereFoodData(boolean thereFoodData) {
+        isThereFoodData = thereFoodData;
     }
 
     public ArrayList<String> getFoodImgUrlList() {
