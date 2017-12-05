@@ -27,10 +27,12 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
     TextView foodNameTextView;
     TextView nutrientsTextView;
     TextView foodContextView;
+    TextView allergenContextView;
 
     TextView nutrientsTitleTextView;
     TextView flavorsTitleTextView;
     TextView ingreTitleTextView;
+    TextView allergenTitleTextView;
     TextView poweredByTitleTextView;
     TextView dataFromTitleTextView;
     TextView hasFlavorTextView;
@@ -68,6 +70,8 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
     ArrayList<String> spoonsFoodIngreList = new ArrayList<String>();
     ArrayList<String> yummlyFoodIngreList = new ArrayList<String>();
 
+    AllergenIngreList myAllergenList;
+
     String fatsecretHomepageURL = "http://platform.fatsecret.com";
     String yummlyAttrRecipeURL;
     String yummlyAttrText;
@@ -89,6 +93,8 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
         food_txt_withSpace = inputText;
         selectedLang = myIntent.getStringExtra("selectedLang");
 
+        allergenContextView = (TextView) findViewById(R.id.allergen_textView);
+        allergenTitleTextView = (TextView) findViewById(R.id.allergenTitleTextView);
         nutrientsTitleTextView = (TextView) findViewById(R.id.nutrientsTitleTextView);
         flavorsTitleTextView = (TextView) findViewById(R.id.flavorsTitleTextView);
         ingreTitleTextView = (TextView) findViewById(R.id.ingreTitleTextView);
@@ -120,6 +126,8 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
         saltyPB = (ProgressBar) findViewById(R.id.salty_progressBar);
         sourPB = (ProgressBar) findViewById(R.id.sour_progressBar);
         sweetPB = (ProgressBar) findViewById(R.id.sweet_progressBar);
+
+        myAllergenList = new AllergenIngreList();
 
         Spanned fatsecretLink = Html.fromHtml("<a href=\"http://platform.fatsecret.com\">Powered by FatSecret</a>");
         fatsecretAttrTextView.setMovementMethod(LinkMovementMethod.getInstance());
@@ -398,7 +406,13 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
         else
             foodIngreString = "There are not ingredients information";
 
+        if(foodIngreString.compareTo("There are not ingredients information") != 0)
+            myFoodInfoContents.setOriginAllergenContext(myAllergenList.isThereAllergenIngre(foodIngreString));
+        else
+            myFoodInfoContents.setOriginAllergenContext("There is not allergen");
+
         myFoodInfoContents.setOriginIngreContext(foodIngreString);
+        allergenContextView.setText(myFoodInfoContents.getOriginAllergenContext());
         // System.out.println("food ingre str : " + foodIngreString);
         foodContextView.setText(foodIngreString);
     }
@@ -438,6 +452,9 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
                 myFoodInfoContents.setTransIngreTitle("재료");
                 myFoodInfoContents.setTransIngreContext("김치, 돼지고기, 양파, 대파, 마늘, 생강, 소금, 버섯");
 
+                myFoodInfoContents.setTransAllergenTitle("알레르기 유발물질");
+                myFoodInfoContents.setTransAllergenContext("달걀, 밀가루, 조개, 굴, 땅콩");
+
                 myFoodInfoContents.setTransPoweredByTitle("도와주신 분들");
                 myFoodInfoContents.setTransDataFromTitle("데이터 장소");
 
@@ -459,6 +476,9 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
 
             ingreTitleTextView.setText(myFoodInfoContents.getTransIngreTitle());
             foodContextView.setText(myFoodInfoContents.getTransIngreContext());
+
+            allergenTitleTextView.setText(myFoodInfoContents.getTransAllergenTitle());
+            allergenContextView.setText(myFoodInfoContents.getTransAllergenContext());
 
             poweredByTitleTextView.setText(myFoodInfoContents.getTransPoweredByTitle());
             dataFromTitleTextView.setText(myFoodInfoContents.getTransDataFromTitle());
@@ -483,6 +503,9 @@ public class FoodInfoActivity_v1 extends AppCompatActivity {
 
             ingreTitleTextView.setText(myFoodInfoContents.getOriginIngreTitle());
             foodContextView.setText(myFoodInfoContents.getOriginIngreContext());
+
+            allergenTitleTextView.setText(myFoodInfoContents.getOriginAllergenTitle());
+            allergenContextView.setText(myFoodInfoContents.getOriginAllergenContext());
 
             poweredByTitleTextView.setText(myFoodInfoContents.getOriginPoweredByTitle());
             dataFromTitleTextView.setText(myFoodInfoContents.getOriginDataFromTitle());

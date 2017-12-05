@@ -8,6 +8,7 @@ public class FoodInfoContents {
     private String originNurientsTitle = "Nutrients";
     private String originFlavorsTitle = "Flavors";
     private String originIngreTitle = "Ingredients";
+    private String originAllergenTitle = "Allergen";
     private String originPoweredByTitle = "Powered By";
     private String originDataFromTitle = "Data From";
     private String originBitter = "Bitter";
@@ -20,11 +21,13 @@ public class FoodInfoContents {
     private String originFoodName = new String();
     private String originNutrientsContext = new String();
     private String originIngreContext = new String();
+    private String originAllergenContext = new String();
 
     private boolean isTranslated = false;
     private String transNurientsTitle = new String();
     private String transFlavorsTitle = new String();
     private String transIngreTitle = new String();
+    private String transAllergenTitle = new String();
     private String transPoweredByTitle = new String();
     private String transDataFromTitle = new String();
     private String transBitter = new String();
@@ -37,6 +40,7 @@ public class FoodInfoContents {
     private String transFoodName = new String();
     private String transNutrientsContext = new String();
     private String transIngreContext = new String();
+    private String transAllergenContext = new String();
 
     public boolean isTranslated() {
         return isTranslated;
@@ -268,5 +272,37 @@ public class FoodInfoContents {
 
     public void setTransIngreContext(String transIngreContext) {
         this.transIngreContext = transIngreContext;
+    }
+
+    public String getOriginAllergenTitle() {
+        return originAllergenTitle;
+    }
+
+    public void setOriginAllergenTitle(String originAllergenTitle) {
+        this.originAllergenTitle = originAllergenTitle;
+    }
+
+    public String getOriginAllergenContext() {
+        return originAllergenContext;
+    }
+
+    public void setOriginAllergenContext(String originAllergenContext) {
+        this.originAllergenContext = originAllergenContext;
+    }
+
+    public String getTransAllergenTitle() {
+        return transAllergenTitle;
+    }
+
+    public void setTransAllergenTitle(String transAllergenTitle) {
+        this.transAllergenTitle = transAllergenTitle;
+    }
+
+    public String getTransAllergenContext() {
+        return transAllergenContext;
+    }
+
+    public void setTransAllergenContext(String transAllergenContext) {
+        this.transAllergenContext = transAllergenContext;
     }
 }
